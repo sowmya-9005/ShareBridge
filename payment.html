@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PayPal Payment Modal</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: transparent;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .payment-wrapper {
+      padding: 30px;
+      background: transparent;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 500px;
+      min-height: 300px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #FF4d00;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 16px;
+      text-align: center;
+      color: #666;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      margin-top: 15px;
+    }
+
+    #paypal-button-container {
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="payment-wrapper">
+    <h1>LIV SAVERZ</h1>
+    <p>Please enter the amount you wish to pay</p>
+
+    <h2>Enter Amount in USD</h2>
+    <input type="number" id="amount" placeholder="Enter The Amount" min="1" />
+    <div id="paypal-button-container"></div>
+  </div>
+
+  <script>
+    let amountUSD = 0;
+
+    document.getElementById('amount').addEventListener('input', function(e) {
+      amountUSD = parseFloat(e.target.value);
+      renderPayPalButton();
+    });
+
+    function renderPayPalButton() {
+      const container = document.getElementById('paypal-button-container');
+      if (!amountUSD || amountUSD <= 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = '';
+
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                currency_code: "USD",
+                value: amountUSD.toString()
+              }
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            alert('Payment successful! Thank you, ' + details.payer.name.given_name);
+          });
+        }
+      }).render('#paypal-button-container');
+    }
+  </script>
+
+</body>
+</html>
